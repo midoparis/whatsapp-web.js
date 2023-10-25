@@ -107,7 +107,9 @@ class RemoteAuth extends BaseAuthStrategy {
         const pathExists = await this.isValidPath(this.userDataDir);
         if (pathExists) {
             await this.compressSession();
-            await this.store.save({session: this.sessionName});
+            const compressedSessionPath = path.join(os.tmpdir(),`${this.sessionName}.zip`);
+
+            await this.store.save({session: this.sessionName, path: compressedSessionPath});
             //await fs.promises.unlink(`${this.sessionName}.zip`);
             await fs.promises.unlink(path.join(os.tmpdir(),`${this.sessionName}.zip`));
             await fs.promises.rm(`${this.tempDir}`, {
@@ -124,7 +126,7 @@ class RemoteAuth extends BaseAuthStrategy {
             const pathExists = await this.isValidPath(this.userDataDir);
             //const compressedSessionPath = `${this.sessionName}.zip`;
             const compressedSessionPath = path.join(os.tmpdir(),`${this.sessionName}.zip`);
-            const sessionExists = await this.store.sessionExists({session: this.sessionName});
+            const sessionExists = await this.store.sessionExists({session: this.sessionName, path:compressedSessionPath});
             if (pathExists) {
                 console.log("Session Path exists remotely.");
 
