@@ -164,7 +164,6 @@ class RemoteAuth extends BaseAuthStrategy {
         await this.deleteMetadata();
 
         const tempDirContents = await fs.promises.readdir(this.tempDir);
-        console.log("Contents of the temp directory before compression:", tempDirContents);
 
         return new Promise((resolve, reject) => {
             archive
