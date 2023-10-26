@@ -108,6 +108,8 @@ class RemoteAuth extends BaseAuthStrategy {
 
     async storeRemoteSession(options) {
         console.log("storing remote session");
+        console.log("store userDataDir : " + this.userDataDir);
+        console.log("store tempDir : " + this.tempDir);
         /* Compress & Store Session */
         const pathExists = await this.isValidPath(this.userDataDir);
         //const compressedSessionPath = `${this.sessionName}.zip`;
@@ -154,12 +156,17 @@ class RemoteAuth extends BaseAuthStrategy {
     async compressSession() {
         const archive = archiver('zip');
         console.log("Compressing session");
+        
+        console.log("compress userDataDir : " + this.userDataDir);
+        console.log("compress tempDir : " + this.tempDir);
+
         const compressedSessionPath = path.join(os.tmpdir(),`${this.sessionName}.zip`);
         const stream = fs.createWriteStream(compressedSessionPath);
 
         await fs.copy(this.userDataDir, this.tempDir).catch(() => {});
         await this.deleteMetadata();
         return new Promise((resolve, reject) => {
+            console.log("finished compressing");
             archive
                 .directory(this.tempDir, false)
                 .on('error', err => reject(err))
@@ -168,6 +175,8 @@ class RemoteAuth extends BaseAuthStrategy {
             stream.on('close', () => resolve());
             archive.finalize();
         });
+        
+
     }
 
     async unCompressSession(compressedSessionPath) {
@@ -187,6 +196,10 @@ class RemoteAuth extends BaseAuthStrategy {
 
     async deleteMetadata() {
         console.log("deleting metadata");
+        
+        console.log("delete userDataDir : " + this.userDataDir);
+        console.log("delete tempDir : " + this.tempDir);
+
         const sessionDirs = [this.tempDir, path.join(this.tempDir, 'Default')];
         for (const dir of sessionDirs) {
             const sessionFiles = await fs.promises.readdir(dir);
