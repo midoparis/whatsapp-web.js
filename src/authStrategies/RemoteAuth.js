@@ -48,6 +48,7 @@ class RemoteAuth extends BaseAuthStrategy {
     }
 
     async beforeBrowserInitialized() {
+        console.log("beforeBrowserInitialized");
         const puppeteerOpts = this.client.options.puppeteer;
         const sessionDirName = this.clientId ? `RemoteAuth-${this.clientId}` : 'RemoteAuth';
         const dirPath = path.join(this.dataPath, sessionDirName);
@@ -68,14 +69,18 @@ class RemoteAuth extends BaseAuthStrategy {
     }
 
     async logout() {
+        console.log("logout");
         await this.disconnect();
+        
     }
 
     async destroy() {
+        console.log("destroy");
         clearInterval(this.backupSync);
     }
 
     async disconnect() {
+        console.log("disconnect");
         await this.deleteRemoteSession();
 
         let pathExists = await this.isValidPath(this.userDataDir);
@@ -89,6 +94,7 @@ class RemoteAuth extends BaseAuthStrategy {
     }
 
     async afterAuthReady() {
+        console.log("after auth ready");
         const sessionExists = await this.store.sessionExists({session: this.sessionName});
         if(!sessionExists) {
             await this.delay(60000); /* Initial delay sync required for session to be stable enough to recover */
@@ -101,6 +107,7 @@ class RemoteAuth extends BaseAuthStrategy {
     }
 
     async storeRemoteSession(options) {
+        console.log("storing remote session");
         /* Compress & Store Session */
         const pathExists = await this.isValidPath(this.userDataDir);
         //const compressedSessionPath = `${this.sessionName}.zip`;
@@ -118,6 +125,7 @@ class RemoteAuth extends BaseAuthStrategy {
     }
 
     async extractRemoteSession() {
+        console.log("extracting remote session");
         const pathExists = await this.isValidPath(this.userDataDir);
         //const compressedSessionPath = `${this.sessionName}.zip`;
         const compressedSessionPath = path.join(os.tmpdir(),`${this.sessionName}.zip`);
@@ -137,13 +145,15 @@ class RemoteAuth extends BaseAuthStrategy {
     }
 
     async deleteRemoteSession() {
-        const sessionExists = await this.store.sessionExists({session: this.sessionName});
+        console.log("deleting remote session");
+        const sessionExists = await this.store
+        .sessionExists({session: this.sessionName});
         if (sessionExists) await this.store.delete({session: this.sessionName});
     }
 
     async compressSession() {
         const archive = archiver('zip');
-        console.log("Compressing session")
+        console.log("Compressing session");
         const compressedSessionPath = path.join(os.tmpdir(),`${this.sessionName}.zip`);
         const stream = fs.createWriteStream(compressedSessionPath);
 
@@ -161,6 +171,7 @@ class RemoteAuth extends BaseAuthStrategy {
     }
 
     async unCompressSession(compressedSessionPath) {
+        console.log("UNCompressing session");
         await new Promise((resolve, reject) => {
             const zip = new AdmZip(compressedSessionPath);
             zip.extractAllToAsync(this.userDataDir, true, false, (err) => {
@@ -175,6 +186,7 @@ class RemoteAuth extends BaseAuthStrategy {
     }
 
     async deleteMetadata() {
+        console.log("deleting metadata");
         const sessionDirs = [this.tempDir, path.join(this.tempDir, 'Default')];
         for (const dir of sessionDirs) {
             const sessionFiles = await fs.promises.readdir(dir);
@@ -198,6 +210,7 @@ class RemoteAuth extends BaseAuthStrategy {
 
     async isValidPath(path) {
         try {
+            console.log("is valid path");
             await fs.promises.access(path);
             return true;
         } catch {
