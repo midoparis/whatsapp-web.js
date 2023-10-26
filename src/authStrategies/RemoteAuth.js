@@ -103,8 +103,8 @@ class RemoteAuth extends BaseAuthStrategy {
     async storeRemoteSession(options) {
         /* Compress & Store Session */
         const pathExists = await this.isValidPath(this.userDataDir);
-        const compressedSessionPath = `${this.sessionName}.zip`;
-
+        //const compressedSessionPath = `${this.sessionName}.zip`;
+        const compressedSessionPath = path.join(os.tmpdir(),`${this.sessionName}.zip`);
         if (pathExists) {
             await this.compressSession();
             await this.store.save({session: this.sessionName, path: compressedSessionPath});
@@ -119,8 +119,8 @@ class RemoteAuth extends BaseAuthStrategy {
 
     async extractRemoteSession() {
         const pathExists = await this.isValidPath(this.userDataDir);
-        const compressedSessionPath = `${this.sessionName}.zip`;
-        //const compressedSessionPath = path.join(os.tmpdir(),`${this.sessionName}.zip`);
+        //const compressedSessionPath = `${this.sessionName}.zip`;
+        const compressedSessionPath = path.join(os.tmpdir(),`${this.sessionName}.zip`);
         const sessionExists = await this.store.sessionExists({session: this.sessionName});
         if (pathExists) {
             await fs.promises.rm(this.userDataDir, {
