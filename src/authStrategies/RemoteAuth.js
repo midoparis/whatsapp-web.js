@@ -143,7 +143,9 @@ class RemoteAuth extends BaseAuthStrategy {
 
     async compressSession() {
         const archive = archiver('zip');
-        const stream = fs.createWriteStream(`${this.sessionName}.zip`);
+        console.log("Compressing session")
+        const compressedSessionPath = path.join(os.tmpdir(),`${this.sessionName}.zip`);
+        const stream = fs.createWriteStream(compressedSessionPath);
 
         await fs.copy(this.userDataDir, this.tempDir).catch(() => {});
         await this.deleteMetadata();
